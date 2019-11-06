@@ -1,1 +1,68 @@
 https://www.tinkercad.com/things/iRTEGg3aXXO-ultrasonido-barrrera/editel?sharecode=8_SYTY76wqhVHoXMYDCbeFL33e-TomD_sWMSWLk6Kag=
+
+
+#include <Servo.h>
+#define PIN_SERVO 3
+#define PIN_MOTOR 2
+
+Servo barrera;
+
+const int pingPin = 11;
+int salida;
+
+void setup() {
+  
+  Serial.begin(9600);
+  barrera.attach(PIN_SERVO,500,2500);
+  pinMode(PIN_MOTOR,OUTPUT);
+  digitalWrite(PIN_MOTOR, HIGH);
+}
+
+void loop() {
+  long duration, inches, cm;
+
+  pinMode(pingPin, OUTPUT);
+  digitalWrite(pingPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pingPin, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(pingPin, LOW);
+
+
+  pinMode(pingPin, INPUT);
+  duration = pulseIn(pingPin, HIGH);
+
+  inches = microsecondsToInches(duration);
+  cm = microsecondsToCentimeters(duration);
+	
+  
+  Serial.print(inches);
+  Serial.print("in, ");
+  Serial.print(cm);
+  Serial.print("cm");
+  Serial.println();
+
+  if(cm<=30)
+  {
+    barrera.write(90);
+    delay(50);
+     digitalWrite(PIN_MOTOR, LOW);
+   }
+   if(cm>35)
+  {
+    barrera.write(0);
+      digitalWrite(PIN_MOTOR, HIGH);
+    delay(50);
+   }
+  
+  
+  delay(100);
+}
+
+long microsecondsToInches(long microseconds) {
+  return microseconds / 74 / 2;
+}
+
+long microsecondsToCentimeters(long microseconds) {
+  return microseconds / 29 / 2;
+}
